@@ -56,7 +56,7 @@ func Create(c *gin.Context) {
 	}
 
 	models.DB.Create(&activity)
-	c.JSON(http.StatusOK, gin.H{"status": "Success", "message": "Success", "data": activity})
+	c.JSON(http.StatusCreated, gin.H{"status": "Success", "message": "Success", "data": activity})
 
 }
 
@@ -71,8 +71,18 @@ func Update(c *gin.Context) {
 
 	if models.DB.Model(&activity).Where("id = ?", id).Updates(&activity).RowsAffected == 0 {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"status": "Not Found", "message": "Activity with ID " + id + " Not Found", "data": gin.H{}})
-		// c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"status": "Failed", "message" : "Update failed", "data":gin.H{}})
 		return
+	}
+
+	if err := models.DB.First(&activity, id).Error; err != nil {
+		switch err {
+		case gorm.ErrRecordNotFound:
+			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"status": "Not Found", "message": "Activity with ID " + id + " Not Found", "data": gin.H{}})
+			return
+		default:
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"status": "Failed", "message": err.Error(), "data": gin.H{}})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"status": "Success", "message": "Success", "data": activity})

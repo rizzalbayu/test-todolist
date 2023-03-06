@@ -8,19 +8,24 @@ import (
 )
 
 func main() {
-	route := gin.Default()
+	// router := gin.Default()
+	router := gin.New()
+	router.Use(
+			gin.LoggerWithWriter(gin.DefaultWriter, "/pathsNotToLog/"),
+			gin.Recovery(),
+	)
 	models.ConnectDatabase()
 
-	route.GET("/activity-groups", activitycontroller.Index)
-	route.GET("/activity-groups/:id", activitycontroller.GetOne)
-	route.POST("/activity-groups/", activitycontroller.Create)
-	route.PATCH("/activity-groups/:id", activitycontroller.Update)
-	route.DELETE("/activity-groups/:id", activitycontroller.Delete)
-	route.GET("/todo-items", todocontroller.Index)
-	route.GET("/todo-items/:id", todocontroller.GetOne)
-	route.POST("/todo-items/", todocontroller.Create)
-	route.PATCH("/todo-items/:id", todocontroller.Update)
-	route.DELETE("/todo-items/:id", todocontroller.Delete)
+	router.GET("/activity-groups", activitycontroller.Index)
+	router.GET("/activity-groups/:id", activitycontroller.GetOne)
+	router.POST("/activity-groups", activitycontroller.Create)
+	router.PATCH("/activity-groups/:id", activitycontroller.Update)
+	router.DELETE("/activity-groups/:id", activitycontroller.Delete)
+	router.GET("/todo-items", todocontroller.Index)
+	router.GET("/todo-items/:id", todocontroller.GetOne)
+	router.POST("/todo-items", todocontroller.Create)
+	router.PATCH("/todo-items/:id", todocontroller.Update)
+	router.DELETE("/todo-items/:id", todocontroller.Delete)
 
-	route.Run(":3000")
+	router.Run(":3030")
 }
